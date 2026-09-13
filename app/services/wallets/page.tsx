@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { saveOrderToGoogleSheets } from '@/googlesheetsService';
+import { saveOrderToGoogleSheets } from "../googlesheetsService";
 
 export default function WalletsPage() {
   const router = useRouter();
