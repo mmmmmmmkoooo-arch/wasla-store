@@ -1,103 +1,62 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
-export default function AdminDashboard() {
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [visitorCount, setVisitorCount] = useState(0);
-  const [savedSuccess, setSavedSuccess] = useState(false);
+export default function HomePage() {
+  const [heroTitle, setHeroTitle] = useState('مرحباً بك في منصة وصلها');
+  const [heroSubtitle, setHeroSubtitle] = useState('وجهتك الأولى لشحن الألعاب والخدمات الرقمية والمونتاج');
+  const [announcement, setAnnouncement] = useState('');
 
   useEffect(() => {
-    // 1. جلب رقم الواتساب المحفوظ
-    const storedPhone = localStorage.getItem('wasla_whatsapp_number') || '201025146867';
-    setWhatsappNumber(storedPhone);
+    // جلب النصوص الديناميكية المحفوظة من الأدمن
+    const savedTitle = localStorage.getItem('wasla_hero_title');
+    const savedSubtitle = localStorage.getItem('wasla_hero_subtitle');
+    const savedAnnouncement = localStorage.getItem('wasla_announcement');
 
-    // 2. قراءة عدد الزوار المحفوظ (أو زيادة العداد عند زيارة الصفحة)
-    const storedCount = localStorage.getItem('wasla_visitor_count') || '1';
-    setVisitorCount(parseInt(storedCount, 10));
+    if (savedTitle) setHeroTitle(savedTitle);
+    if (savedSubtitle) setHeroSubtitle(savedSubtitle);
+    if (savedAnnouncement) setAnnouncement(savedAnnouncement);
   }, []);
 
-  const handleSaveSettings = (e: React.FormEvent) => {
-    e.preventDefault();
-    // حفظ رقم الواتساب الجديد
-    localStorage.setItem('wasla_whatsapp_number', whatsappNumber);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
-  };
-
-  const resetVisitors = () => {
-    if (confirm('هل أنت تأكد من إعادة ضبط عداد الزوار إلى صفر؟')) {
-      localStorage.setItem('wasla_visitor_count', '0');
-      setVisitorCount(0);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6 rtl dir-rtl">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-950 text-white rtl dir-rtl flex flex-col justify-between">
+      
+      {/* شريط الإعلان العاجل العلوي */}
+      {announcement && (
+        <div className="bg-emerald-600 text-gray-950 font-bold text-center py-2 px-4 text-sm shadow-md animate-pulse">
+          📢 {announcement}
+        </div>
+      )}
+
+      {/* الواجهة الرئيسية */}
+      <main className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-6">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-emerald-400 max-w-3xl leading-tight">
+          {heroTitle}
+        </h1>
         
-        {/* الهيدر */}
-        <div className="border-b border-gray-700 pb-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-emerald-400">لوحة تحكم منصة وصلها</h1>
-          <span className="bg-emerald-950 text-emerald-300 text-sm px-3 py-1 rounded-full border border-emerald-800">
-            أدمن
-          </span>
+        <p className="text-lg md:text-xl text-gray-300 max-w-2xl">
+          {heroSubtitle}
+        </p>
+
+        {/* أزرار الخدمات السريعة */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-xl pt-6">
+          <Link href="/games" className="bg-gray-900 border border-emerald-600 hover:bg-emerald-600 hover:text-gray-950 p-4 rounded-xl transition-all font-bold">
+            🎮 شحن الألعاب
+          </Link>
+          <Link href="/services/editing" className="bg-gray-900 border border-emerald-600 hover:bg-emerald-600 hover:text-gray-950 p-4 rounded-xl transition-all font-bold">
+            🎬 خدمات المونتاج
+          </Link>
+          <Link href="/wallets" className="bg-gray-900 border border-emerald-600 hover:bg-emerald-600 hover:text-gray-950 p-4 rounded-xl transition-all font-bold">
+            💳 المحافظ الرقمية
+          </Link>
         </div>
+      </main>
 
-        {/* إحصائيات الموقع - عداد الزوار */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg flex justify-between items-center">
-            <div>
-              <p className="text-gray-400 text-sm">إجمالي عدد زوار الموقع</p>
-              <h2 className="text-4xl font-extrabold text-white mt-2">{visitorCount} <span className="text-base font-normal text-emerald-400">زائر</span></h2>
-            </div>
-            <button 
-              onClick={resetVisitors}
-              className="text-xs text-red-400 hover:text-red-300 underline"
-            >
-              تصفير العداد
-            </button>
-          </div>
-        </div>
-
-        {/* تعديل رقم الواتساب */}
-        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
-          <h2 className="text-xl font-semibold text-emerald-400 mb-4">إعدادات التواصل (الواتساب)</h2>
-          
-          <form onSubmit={handleSaveSettings} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                رقم الواتساب المستلم للطلبات والدعم (اكتب الرقم بالكود الدولي بدون +)
-              </label>
-              <input
-                type="text"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                placeholder="مثال: 201025146867"
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-emerald-500 dir-ltr text-right"
-                required
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                الرقم الحالي الذي سيتم تحويل الزوار إليه عبر زر الواتساب في الموقع.
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-6 rounded-lg transition-colors"
-            >
-              حفظ التعديلات
-            </button>
-
-            {savedSuccess && (
-              <span className="mr-4 text-emerald-400 font-medium">
-                ✓ تم حفظ رقم الواتساب الجديد بنجاح!
-              </span>
-            )}
-          </form>
-        </div>
-
-      </div>
+      {/* الفوتر */}
+      <footer className="border-t border-gray-900 text-center py-4 text-xs text-gray-500">
+        جميع الحقوق محفوظة لمنصة وصلها © 2026
+      </footer>
     </div>
   );
 }
